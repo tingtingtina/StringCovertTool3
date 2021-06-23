@@ -48,7 +48,7 @@ class TkImport:
             var_input_path.set(input_path)
 
         def enter_target_file_path():
-            target_file_path = tkinter.filedialog.askopenfilename(filetypes=[("xml file", "*.xml*")])
+            target_file_path = tkinter.filedialog.askopenfilename(filetypes=[("xml file", "*.xml")])
             print(target_file_path)
             var_target_file_path.set(target_file_path)
 

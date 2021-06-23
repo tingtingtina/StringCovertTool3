@@ -60,7 +60,7 @@ class Error:
                   "\nNo key column was retrieved. The key column should be named Android keyName"
         elif self.code == ERROR_MODULE_NOT_FOUND:
             des = "Table structure error：" \
-                  "\nThe Module column was not retrieved and the key column needs to be named Android Module"
+                  "\nThe Module column was not retrieved and the key column needs to be named Android module"
         elif self.code == EXCEPTION_EXL_FILE:
             des = "Table structure error：" \
                   "\nThe table is empty or no header row is retrieved, and the header column is the first row"

@@ -50,7 +50,7 @@ class TkExport:
             var_xml_dir_path.set(xml_dir_path)
 
         def enter_xml_file_path():
-            xml_file_path = tkinter.filedialog.askopenfilename(filetypes=[("xml file", "*.xml*")])
+            xml_file_path = tkinter.filedialog.askopenfilename(filetypes=[("xml file", "*.xml")])
             print(xml_file_path)
             var_xml_file_path.set(xml_file_path)
 
