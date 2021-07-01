@@ -115,21 +115,22 @@ class XMLParse:
         # Log.info("--- string end ---\n")
 
         # 数组
-        # Log.info("--- array ---")
+        Log.info("--- array ---")
         array_nodes = xml_doc.getElementsByTagName('string-array')
         for array_node in array_nodes:
             xmlKey = array_node.getAttribute('name')
-
+            Log.debug("xmlKey name -- > " + xmlKey)
             child_nodes = array_node.getElementsByTagName('item')
             for idx, child_node in enumerate(child_nodes):
                 newKey = xmlKey + "-INDEX-" + str(idx)
 
                 xmlValue = child_node.firstChild.data
+                Log.debug("newKey: %s value: %s" % (newKey, xmlValue))
                 for index, key in enumerate(keys):
                     if key == newKey and len(values[index]) != 0:
                         child_node.firstChild.data = values[index]
                         Log.debug("%s : %s --> %s" % (newKey, xmlValue, child_node.firstChild.data))
-        # Log.info("--- array end ---\n")
+        Log.info("--- array end ---\n")
         writeFile = open(file_path, 'wb')
         writeFile.write(xml_doc.toxml('utf-8'))
         writeFile.close()
@@ -144,6 +145,10 @@ class XMLParse:
         if not file_path or not os.path.exists(file_path):
             Log.error("xml 文件不存在")
             return
+        if Constant.Config.export_only_zh:
+            # 仅中文，排除 values-zh 和 ja 文件夹（日语有太多中文，容易被误导出，因此先忽略掉）
+            if "values-zh" in file_path or "values-ja" in file_path:
+                return collections.OrderedDict()
         xml_doc = xml.dom.minidom.parse(file_path)
         nodes = xml_doc.getElementsByTagName('string')
         dic = collections.OrderedDict()
