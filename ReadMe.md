@@ -63,10 +63,14 @@ python Import.py -i "C:\Users\Administrator\Desktop\App Native - 1126.xlsx" -l "
 
 表示 从把表格中 zh 那一列内容，替换到 strings_moment.xml 文件中
 
+也可以使用相对路径
+```python
+python Import.py -i "./test/App Native.xlsx" -l en -f ./test/strings_moment.xml
+```
 - 文件夹
 
 ```python
-python Export.py -i "C:\Users\Administrator\Desktop\App Native - 1126.xlsx" -d "C:\Users\Administrator\Desktop\p"
+python Import.py -i "C:\Users\Administrator\Desktop\App Native - 1126.xlsx" -d "C:\Users\Administrator\Desktop\p"
 ```
 ### 导出
 > 导出没有添加输入参数，直接支持可视化操作
