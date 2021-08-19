@@ -42,25 +42,36 @@ class XMLParse:
                 value = string_node.firstChild.data
         elif string_node.firstChild.nodeType == string_node.ELEMENT_NODE:  # 元素节点
             data_node = string_node.getElementsByTagName("Data")  # 字符串样式
-            if len(data_node) != 0 and len(data_node[0].firstChild.data) != 0:
+            # 处理 # CDATA
+            if len(data_node) != 0 and data_node[0].firstChild.nodeType == data_node[0].CDATA_SECTION_NODE:
                 data_value = data_node[0].firstChild.data
-                value = "<Data>" + data_value + "</Data>"
+                value = data_value
+                # value = "<Data><![CDATA[" + data_value + "]]</>"
         return value
 
     @staticmethod
     def update_multi_xml_value(sub_dir_path, keys, values, modules):
+        """
+        遍历每个子目录下的文件，把每一种语言的对应 module 下 key 将value 导入进去
+        :param sub_dir_path: 目标子目录，比如 value-zh
+        :param keys: 集合，目标目录下所有 key
+        :param values: 集合，目标子目录下所有 value
+        :param modules: 集合，目标子目录下每个 xml 文件的名字（不含.xml)，三个集合元素一一对应
+        """
         Log.info("\n" + sub_dir_path + "\n")
-        '''
-        sub_dir_path: 目标子目录，比如 value-zh
-        '''
         if len(modules) == 0:
             return
 
         # 先排序，把 excel 中的统一 module 排到一起
         # 排序，分块处理
+        # 当前正在处理的 module
         current_module = modules[0]
+        # 每个 module 中文案的数目
         module_length_list = []
+        # 当前遍历的 module中文案的数目
         current_module_len = 0
+
+        # 新 modules 集合，分块处理
         modules_new = []
         values_new = []
         keys_new = []
@@ -93,6 +104,13 @@ class XMLParse:
 
     @staticmethod
     def update_xml_value(file_path, keys, values):
+        """
+        替换 xml 中 value
+        :param file_path: xml 文件路径
+        :param keys: xml 键值对 - key
+        :param values: xml 键值对 - value
+        :return:
+        """
         Log.info("--- updating xml... \n%s" % file_path)
         if not os.path.exists(file_path):
             return
@@ -103,15 +121,20 @@ class XMLParse:
         nodes = xml_doc.getElementsByTagName('string')
         for node in nodes:
             xmlKey = node.getAttribute("name")
-            xmlValue = ""  # 改变量仅用于输出
+            xmlValue = ""  # 该变量仅用于输出
             if node.firstChild is None:
                 continue
             xmlValue = XMLParse.get_text_node_value(node)
 
             for index, key in enumerate(keys):
                 if key == xmlKey and len(values[index]) != 0:
-                    node.firstChild.data = values[index]
-                    Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, node.firstChild.data))
+                    if node.firstChild.nodeType == node.ELEMENT_NODE:
+                        # 处理 CDATA
+                        data_node = node.getElementsByTagName("Data")
+                        data_node[0].firstChild.data = values[index]
+                    else:
+                        node.firstChild.data = values[index]
+                    Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, values[index]))
         # Log.info("--- string end ---\n")
 
         # 数组
