@@ -36,11 +36,12 @@ class XMLParse:
         :param string_node: string 结点
         :return: data 类型结点 text
         """
-        if string_node.firstChild.nodeType == string_node.TEXT_NODE:
+        nodeType = string_node.firstChild.nodeType
+        if nodeType == string_node.TEXT_NODE or nodeType == string_node.CDATA_SECTION_NODE:
             # 获取某个元素节点的文本内容，先获取子文本节点，然后通过“data”属性获取文本内容
             if len(string_node.firstChild.data) != 0:
                 value = string_node.firstChild.data
-        elif string_node.firstChild.nodeType == string_node.ELEMENT_NODE:  # 元素节点
+        elif nodeType.nodeType == string_node.ELEMENT_NODE:  # 元素节点
             data_node = string_node.getElementsByTagName("Data")  # 字符串样式
             # 处理 # CDATA
             if len(data_node) != 0 and data_node[0].firstChild.nodeType == data_node[0].CDATA_SECTION_NODE:
@@ -193,12 +194,12 @@ def update_xml_base_xml(xml_doc, keys, values):
 
         for index, key in enumerate(keys):
             if key == xmlKey and len(values[index]) != 0:
-                if node.firstChild.nodeType == node.ELEMENT_NODE:
+                if node.firstChild.nodeType == node.TEXT_NODE or node.firstChild.nodeType == node.CDATA_SECTION_NODE:
+                    node.firstChild.data = values[index]
+                elif node.firstChild.nodeType == node.ELEMENT_NODE:
                     # 处理 CDATA
                     data_node = node.getElementsByTagName("Data")
                     data_node[0].firstChild.data = values[index]
-                else:
-                    node.firstChild.data = values[index]
                 Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, values[index]))
     Log.info("--- string end ---\n")
 
@@ -229,12 +230,12 @@ def update_xml_base_xls(xml_doc, keys, values):
             xmlKey = node.getAttribute("name")
             xmlValue = XMLParse.get_text_node_value(node)
             if xmlKey == key:
+                if node.firstChild.nodeType == node.TEXT_NODE or node.firstChild.nodeType == node.CDATA_SECTION_NODE:
+                    node.firstChild.data = values[index]
                 if node.firstChild.nodeType == node.ELEMENT_NODE:
                     # 处理 CDATA
                     data_node = node.getElementsByTagName("Data")
                     data_node[0].firstChild.data = values[index]
-                else:
-                    node.firstChild.data = values[index]
                 Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, values[index]))
                 break
 
@@ -243,10 +244,8 @@ def update_xml_base_xls(xml_doc, keys, values):
                 newel = xml_doc.createElement("string")
                 newel.setAttribute('name', key)
                 if isCDATAValue(values[index]):
-                    data_el = xml_doc.createElement("Data")
                     newCDATA = xml_doc.createCDATASection(values[index])
-                    data_el.appendChild(newCDATA)
-                    newel.appendChild(data_el)
+                    newel.appendChild(newCDATA)
                 else:
                     # 一般文本
                     newText = xml_doc.createTextNode(values[index])
