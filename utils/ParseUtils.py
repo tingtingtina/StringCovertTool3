@@ -117,42 +117,12 @@ class XMLParse:
         # Log.info ("--- string ---")
         # 读取文档
         xml_doc = xml.dom.minidom.parse(file_path)
-        # filename
-        nodes = xml_doc.getElementsByTagName('string')
-        for node in nodes:
-            xmlKey = node.getAttribute("name")
-            xmlValue = ""  # 该变量仅用于输出
-            if node.firstChild is None:
-                continue
-            xmlValue = XMLParse.get_text_node_value(node)
 
-            for index, key in enumerate(keys):
-                if key == xmlKey and len(values[index]) != 0:
-                    if node.firstChild.nodeType == node.ELEMENT_NODE:
-                        # 处理 CDATA
-                        data_node = node.getElementsByTagName("Data")
-                        data_node[0].firstChild.data = values[index]
-                    else:
-                        node.firstChild.data = values[index]
-                    Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, values[index]))
-        # Log.info("--- string end ---\n")
+        if Constant.Config.import_base_xml:
+            update_xml_base_xml(xml_doc, keys, values)
+        else:
+            update_xml_base_xls(xml_doc, keys, values)
 
-        # 数组
-        Log.info("--- array ---")
-        array_nodes = xml_doc.getElementsByTagName('string-array')
-        for array_node in array_nodes:
-            xmlKey = array_node.getAttribute('name')
-            Log.debug("xmlKey name -- > " + xmlKey)
-            child_nodes = array_node.getElementsByTagName('item')
-            for idx, child_node in enumerate(child_nodes):
-                newKey = xmlKey + "-INDEX-" + str(idx)
-
-                xmlValue = child_node.firstChild.data
-                Log.debug("newKey: %s value: %s" % (newKey, xmlValue))
-                for index, key in enumerate(keys):
-                    if key == newKey and len(values[index]) != 0:
-                        child_node.firstChild.data = values[index]
-                        Log.debug("%s : %s --> %s" % (newKey, xmlValue, child_node.firstChild.data))
         Log.info("--- array end ---\n")
         writeFile = open(file_path, 'wb')
         writeFile.write(xml_doc.toxml('utf-8'))
@@ -202,7 +172,7 @@ class XMLParse:
             key = array_node.getAttribute('name')
             child_nodes = array_node.getElementsByTagName('item')
             for idx, child_node in enumerate(child_nodes):
-                newKey = key + "-INDEX-" + str(idx)
+                newKey = convertStringArrayName(key, str(idx))
                 value = XMLParse.get_text_node_value(child_node)
                 if not Constant.Config.export_only_zh:
                     dic[newKey] = value
@@ -210,6 +180,137 @@ class XMLParse:
                     if is_chinese(value):
                         dic[newKey] = value
         return dic
+
+
+def update_xml_base_xml(xml_doc, keys, values):
+    # filename
+    nodes = xml_doc.getElementsByTagName('string')
+    for node in nodes:
+        xmlKey = node.getAttribute("name")
+        xmlValue = ""  # 该变量仅用于输出
+        if node.firstChild is None:
+            continue
+        xmlValue = XMLParse.get_text_node_value(node)
+
+        for index, key in enumerate(keys):
+            if key == xmlKey and len(values[index]) != 0:
+                if node.firstChild.nodeType == node.ELEMENT_NODE:
+                    # 处理 CDATA
+                    data_node = node.getElementsByTagName("Data")
+                    data_node[0].firstChild.data = values[index]
+                else:
+                    node.firstChild.data = values[index]
+                Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, values[index]))
+    Log.info("--- string end ---\n")
+
+    # 数组
+    Log.info("--- array ---")
+    array_nodes = xml_doc.getElementsByTagName('string-array')
+    for array_node in array_nodes:
+        xmlKey = array_node.getAttribute('name')
+        Log.debug("xmlKey name -- > " + xmlKey)
+        child_nodes = array_node.getElementsByTagName('item')
+        for idx, child_node in enumerate(child_nodes):
+            newKey = convertStringArrayName(xmlKey, str(idx))
+            xmlValue = child_node.firstChild.data
+            Log.debug("newKey: %s value: %s" % (newKey, xmlValue))
+            for index, key in enumerate(keys):
+                if key == newKey and len(values[index]) != 0:
+                    child_node.firstChild.data = values[index]
+                    Log.debug("%s : %s --> %s" % (newKey, xmlValue, child_node.firstChild.data))
+    Log.info("--- array end ---\n")
+
+
+def update_xml_base_xls(xml_doc, keys, values):
+    # 如果不存在 xls 中的 key，则 append
+    nodes = xml_doc.getElementsByTagName('string')
+    for index, key in enumerate(keys):
+        if len(values[index]) == 0 or isStringArrayKey(key) is not None:
+            continue
+        Log.debug("--xml key--" + key)
+        for nodeIndex, node in enumerate(nodes):
+            if isCDATAKey(key):
+                # TODO
+                continue
+            else:
+                xmlKey = node.getAttribute("name")
+                xmlValue = XMLParse.get_text_node_value(node)
+                if xmlKey == key:
+                    if node.firstChild.nodeType == node.ELEMENT_NODE:
+                        # 处理 CDATA
+                        data_node = node.getElementsByTagName("Data")
+                        data_node[0].firstChild.data = values[index]
+                    else:
+                        node.firstChild.data = values[index]
+                    Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, values[index]))
+                    break
+
+            if nodeIndex == (len(nodes) - 1):
+                # xml 中找不到 xls 中的key，xml 添加元素
+                if isCDATAKey(key):
+                    # CDATA
+                    Log.debug("")
+                else:
+                    # 一般文本
+                    newel = xml_doc.createElement("string")
+                    newText = xml_doc.createTextNode(values[index])
+                    newel.setAttribute('name', key)
+                    newel.appendChild(newText)
+                    xml_doc.documentElement.appendChild(newel)
+
+    # 数组
+    # Log.info("--- array ---")
+    array_nodes = xml_doc.getElementsByTagName('string-array')
+    for index, key in enumerate(keys):
+        if len(values[index]) == 0:
+            continue
+        if isStringArrayKey(key) is None:
+            continue
+
+        Log.debug("--xml array key--" + key)
+        arrayKey = isStringArrayKey(key)[0]
+        arrayIndex = isStringArrayKey(key)[1]
+        for nodeIndex, array_node in enumerate(array_nodes):
+            xmlKey = array_node.getAttribute('name')
+            if xmlKey == arrayKey:
+                child_nodes = array_node.getElementsByTagName('item')
+                for idx, child_node in enumerate(child_nodes):
+                    tempKey = convertStringArrayName(xmlKey, str(idx))
+                    xmlValue = child_node.firstChild.data
+                    if tempKey == key:
+                        child_node.firstChild.data = values[index]
+                        Log.debug("%s : %s --> %s" % (tempKey, xmlValue, child_node.firstChild.data))
+                        break
+
+            # # 没有数组，则需要添加
+            # newel = xml_doc.createElement("string-array")
+            # newel.createElement("item")
+            # newText = xml_doc.createTextNode(values[index])
+            # newel.appendChild(newText)
+            # Log.debug("--convert key--" + arrayKey)
+
+
+def convertStringArrayName(key, index):
+    """
+    :param key: 字符串数组的key
+    :param index: 数组item 索引，从 0开始
+    :return: 返回每一条数组item 新key
+    比如 array1 --> array1-INDEX-0
+    """
+    return key + "-INDEX-" + index
+
+
+def isStringArrayKey(key):
+    index = key.find('-INDEX-')
+    if index > 0:
+        arrayKey = key[0:index]
+        arrayIndex = key[index:len(key)]
+        return arrayKey, arrayIndex
+    return None
+
+
+def isCDATAKey(key):
+    return False
 
 
 def is_chinese(string):

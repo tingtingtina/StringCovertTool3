@@ -82,6 +82,9 @@ class Config:
     keyTitle = "Android keyName"  # key 名（Android 字符串 name)
     moduleTitle = "Android module"  # module 名（xml 文件名）
     import_start_col = 2  # 从第几列开始导入
+    import_base_xml = False  # 导入是否基于xml
+    # True，基于 xml 只替换xml 存在的 key-value
+    # False，基于 xls，如果 xml 有对应 key 替换，如果没有，则在文件末尾追加对应 文案
 
     export_excel_name = "Output.xls"  # 导出的 excel 文件名
     export_base_dir = "values-zh"  # 导出基准文件夹
