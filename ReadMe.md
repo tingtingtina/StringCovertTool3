@@ -16,7 +16,8 @@ Config 里面默认配置了 表格的 title 等属性
 keyTitle = "Android keyName"  # key 名（Android 字符串 name)
 moduleTitle = "Android module"  # module 名（xml 文件名）
 import_start_col = 2  # 从第几列开始导入
-    
+import_base_xml = True  # 导入是否基于xml
+
 export_excel_name = "Output.xls"  # 导出的 excel 文件名
 export_base_dir = "values-zh"  # 导出基准文件夹
 export_base_title = "zh"  # 导出基准 title
@@ -107,13 +108,15 @@ python Import.py -i "C:\Users\Administrator\Desktop\App Native - 1126.xlsx" -d "
 | strings_moment | moment_2        |      |      |      |
 | strings_moment | moment_3        |      |      |      |
 | strings_device | device_1        |      |      |      |
-### 注意点：
+||||||
+
+### 配置项说明
 
 - xml 目录指的都是包含着 values-zh 等目录的文件夹
 
 - 这里的 module 指的是 同一种语言下的 strings.xml 文件的文件名
 
-- 如果在字符串定义有数组，比如 strings-array表示，会自定义名称，比如 下面就会生成两个键值对
+- 如果在字符串定义有数组，比如 strings-array 表示，会自定义名称，比如 下面就会生成两个键值对
 
   - gender_item-INDEX-0:男
   - gender_item-INDEX-1:女
@@ -124,7 +127,39 @@ python Import.py -i "C:\Users\Administrator\Desktop\App Native - 1126.xlsx" -d "
   	<item>女</item>
   </string-array>
   ```
-- 关于导入列配置 ```import_start_col```，项目使用表格 是从第 2 列开始做导入（从0开始），也就是 en 和 de 需导入，在实际使用中可根据需求处理
+  
+- ***import_start_col***
+
+    关于导入列配置 ```import_start_col```，项目使用表格 是从第 2 列开始做导入（从0开始），也就是 en 和 de 需导入，在实际使用中可根据需求处理
+
+- ***import_base_xml***
+
+    标识导入 xml 时是否基于 xml 文件
+
+    - True（Default），基于 xml 只替换xml 存在的 key-value
+
+    - False，基于 xls，如果 xml 有对应 key 替换，如果没有，则在文件末尾追加对应 文案
+
+    >added in 210820：需求来源，已经实现的方法是 根据 xml 文件，去在表格中查找相应的 key。实际国际化时，开发通常会先支持 中英，其他小语种不添加字符串（则默认为英文）。这时候去根据 xml 导入的话，那么导入之前就要先把缺少的文案添加到xml 中才能处理，文案缺失的越多，越浪费人力和时间。因此添加该属性，用来按需处理。如果选择基于 xls 导入，那么缺失的 key-value 会追加到 xml 中
+
+    目前已实现追加有：
+
+    - 一般字符串，如
+
+      ```xml
+      <string name="mine_sign">已签到</string>
+      ```
+
+    - CDATA类型字符串：如
+
+      ```xml
+      <string name="total"><Data><![CDATA[Total <font color="#FF7439">%1$s</font>]]></Data>
+      ```
+
+    - 字符串数组（不支持追加）
+      
+        - 考虑到 xls可能是乱序，追加容易错位，使用属性标识顺序，还是不太方便，暂不支持。
+
 - ***export_only_zh***
   
     > 需求来源于，我们在项目中会追加文案（默认中文），在没有多语言翻译的时候，其他的 strings 都会写成中文，为了便于仅导出为翻译的部分，添加此字段辅助。
@@ -198,4 +233,3 @@ if is_chinese(value) or file_path.find("values-en") >= 0:
     1. 修改代码
     2. 使用目录导出（通用）
     3. Excel整理
-
