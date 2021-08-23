@@ -222,7 +222,7 @@ def main():
 - 比如导出韩语中需要翻译的内容。如果只需要对比中文，导出韩文需要翻译的用上面的方法即可
 - 如果要导出中英韩的话，使用目录方式。但需要修改下代码处理，最好先和中文的内容做下匹配，使得中英韩的key组数一致，避免内容缺失
 - 思想，保留中文，和英文文件夹下的内容
-- 实现：在ParseUtils 中的 `is_chinese(value)`` 的判断部分增加一个判断 `file_path.find("values-en") >= 0` 表示中文和英文文件夹下的内容都导出
+- 实现：在ParseUtils 中的 `is_chinese(value)` 的判断部分增加一个判断 `file_path.find("values-en") >= 0` 表示中文和英文文件夹下的内容都导出
 
 ```python
 if is_chinese(value) or file_path.find("values-en") >= 0:
@@ -233,3 +233,26 @@ if is_chinese(value) or file_path.find("values-en") >= 0:
     1. 修改代码
     2. 使用目录导出（通用）
     3. Excel整理
+
+## TODO
+
+1. 导入支持追加 key-value，减少人工对齐
+
+   1. ✔️string
+   2. ✔️string：CDATA
+   3. string-array
+   4. 导入支持常用标签比如<u> <b> <i>
+
+2. ✔️导入是数字时，xlrd会读成浮点型，需兼容
+
+3. ✔️特殊空处理
+
+   1. xml 中 <string> 空字符串
+
+   2. excel 是空字符串
+
+      >导出如果是空，不导出
+      >
+      >导入允许导入空
+      >
+      >重点处理 xml 是空，导入时，Log 输出 xmlValue 为空情况

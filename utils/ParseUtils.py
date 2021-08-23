@@ -1,9 +1,10 @@
 # -*- coding: UTF-8 -*-
 
 import xlrd
-import sys
 import xml.dom.minidom
 import os.path
+
+from xlrd import Book
 
 import Constant
 from utils.LogUtils import Log
@@ -11,6 +12,7 @@ import collections
 
 
 class XLSParse:
+    data: Book
 
     # 打开Excel
     def open_excel(self, filePath):
@@ -36,18 +38,18 @@ class XMLParse:
         :param string_node: string 结点
         :return: data 类型结点 text
         """
-        nodeType = string_node.firstChild.nodeType
-        if nodeType == string_node.TEXT_NODE or nodeType == string_node.CDATA_SECTION_NODE:
+        value_node = string_node.firstChild
+        if value_node is None:
+            return ""
+        if value_node.nodeType == string_node.TEXT_NODE or value_node.nodeType == value_node.CDATA_SECTION_NODE:
             # 获取某个元素节点的文本内容，先获取子文本节点，然后通过“data”属性获取文本内容
-            if len(string_node.firstChild.data) != 0:
-                value = string_node.firstChild.data
-        elif nodeType.nodeType == string_node.ELEMENT_NODE:  # 元素节点
+            value = value_node.data
+        elif value_node.nodeType == value_node.ELEMENT_NODE:  # 元素节点
             data_node = string_node.getElementsByTagName("Data")  # 字符串样式
             # 处理 # CDATA
-            if len(data_node) != 0 and data_node[0].firstChild.nodeType == data_node[0].CDATA_SECTION_NODE:
+            if data_node is not None and data_node[0].firstChild.nodeType == data_node[0].CDATA_SECTION_NODE:
                 data_value = data_node[0].firstChild.data
                 value = data_value
-                # value = "<Data><![CDATA[" + data_value + "]]</>"
         return value
 
     @staticmethod
@@ -191,16 +193,17 @@ def update_xml_base_xml(xml_doc, keys, values):
         if node.firstChild is None:
             continue
         xmlValue = XMLParse.get_text_node_value(node)
-
         for index, key in enumerate(keys):
-            if key == xmlKey and len(values[index]) != 0:
+            value = formatCell(values[index])
+            if key == xmlKey:
                 if node.firstChild.nodeType == node.TEXT_NODE or node.firstChild.nodeType == node.CDATA_SECTION_NODE:
-                    node.firstChild.data = values[index]
+                    node.firstChild.data = value
                 elif node.firstChild.nodeType == node.ELEMENT_NODE:
                     # 处理 CDATA
                     data_node = node.getElementsByTagName("Data")
-                    data_node[0].firstChild.data = values[index]
-                Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, values[index]))
+                    data_node[0].firstChild.data = value
+                Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, value))
+                break
     Log.info("--- string end ---\n")
 
     # 数组
@@ -211,12 +214,18 @@ def update_xml_base_xml(xml_doc, keys, values):
         child_nodes = array_node.getElementsByTagName('item')
         for idx, child_node in enumerate(child_nodes):
             newKey = convertStringArrayName(xmlKey, str(idx))
-            xmlValue = child_node.firstChild.data
+            if child_node.firstChild is None:
+                # 处理空字符串，比如  <string name="ok"></string>
+                xmlValue = ""
+            else:
+                xmlValue = child_node.firstChild.data
             # Log.debug("newKey: %s value: %s" % (newKey, xmlValue))
             for index, key in enumerate(keys):
-                if key == newKey and len(values[index]) != 0:
-                    child_node.firstChild.data = values[index]
+                value = formatCell(values[index])
+                if key == newKey:
+                    child_node.firstChild.data = value
                     Log.debug("%s : %s --> %s" % (newKey, xmlValue, child_node.firstChild.data))
+                    break
     Log.info("--- array end ---\n")
 
 
@@ -224,31 +233,36 @@ def update_xml_base_xls(xml_doc, keys, values):
     # 如果不存在 xls 中的 key，则 append
     nodes = xml_doc.getElementsByTagName('string')
     for index, key in enumerate(keys):
-        if len(values[index]) == 0 or isStringArrayKey(key) is not None:
+        value = formatCell(values[index])
+        if isStringArrayKey(key) is not None:
             continue
         for nodeIndex, node in enumerate(nodes):
             xmlKey = node.getAttribute("name")
             xmlValue = XMLParse.get_text_node_value(node)
             if xmlKey == key:
-                if node.firstChild.nodeType == node.TEXT_NODE or node.firstChild.nodeType == node.CDATA_SECTION_NODE:
-                    node.firstChild.data = values[index]
-                if node.firstChild.nodeType == node.ELEMENT_NODE:
+                value_node = node.firstChild
+                if value_node is None:
+                    # 原 xml string 为空 暂不处理
+                    pass
+                elif value_node.nodeType == node.TEXT_NODE or value_node.nodeType == node.CDATA_SECTION_NODE:
+                    value_node.data = value
+                elif value_node.nodeType == node.ELEMENT_NODE:
                     # 处理 CDATA
                     data_node = node.getElementsByTagName("Data")
-                    data_node[0].firstChild.data = values[index]
-                Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, values[index]))
+                    data_node[0].firstChild.data = value
+                Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, value))
                 break
 
             if nodeIndex == (len(nodes) - 1):
                 # xml 中找不到 xls 中的key，xml 添加元素
                 newel = xml_doc.createElement("string")
                 newel.setAttribute('name', key)
-                if isCDATAValue(values[index]):
-                    newCDATA = xml_doc.createCDATASection(values[index])
+                if isCDATAValue(value):
+                    newCDATA = xml_doc.createCDATASection(value)
                     newel.appendChild(newCDATA)
                 else:
                     # 一般文本
-                    newText = xml_doc.createTextNode(values[index])
+                    newText = xml_doc.createTextNode(value)
                     newel.appendChild(newText)
                 xml_doc.documentElement.appendChild(newel)
 
@@ -260,12 +274,18 @@ def update_xml_base_xls(xml_doc, keys, values):
         child_nodes = array_node.getElementsByTagName('item')
         for idx, child_node in enumerate(child_nodes):
             newKey = convertStringArrayName(xmlKey, str(idx))
-            xmlValue = child_node.firstChild.data
+            if child_node.firstChild is None:
+                # 处理空字符串，比如  <string name="ok"></string>
+                xmlValue = ""
+            else:
+                xmlValue = child_node.firstChild.data
             # Log.debug("newKey: %s value: %s" % (newKey, xmlValue))
             for index, key in enumerate(keys):
-                if key == newKey and len(values[index]) != 0:
-                    child_node.firstChild.data = values[index]
+                value = formatCell(values[index])
+                if key == newKey:
+                    child_node.firstChild.data = value
                     Log.debug("%s : %s --> %s" % (newKey, xmlValue, child_node.firstChild.data))
+                    break
     Log.info("--- array end ---\n")
 
     # # 数组
@@ -298,6 +318,20 @@ def update_xml_base_xls(xml_doc, keys, values):
     # newText = xml_doc.createTextNode(values[index])
     # newel.appendChild(newText)
     # Log.debug("--convert key--" + arrayKey)
+
+
+def formatCell(value):
+    """
+    格式化 value，xlrd 会将 整数转换成浮点数，比如 666，会解析成 666.0
+    :param value: 原数据
+    :return: 格式化后数据
+    """
+    if isinstance(value, float):
+        if value % 1 == 0.0:
+            value = str(int(value))  # 浮点转成整型,再转成str
+        else:
+            value = str(value)
+    return value
 
 
 def convertStringArrayName(key, index):
