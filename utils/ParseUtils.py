@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import re
 
 import xlrd
 import xml.dom.minidom
@@ -7,6 +8,7 @@ import os.path
 from xlrd import Book
 
 import Constant
+from utils.ConvertUtils import convert_str, reverse_convert_str
 from utils.LogUtils import Log
 import collections
 
@@ -160,6 +162,8 @@ class XMLParse:
             key = node.getAttribute("name")
 
             value = XMLParse.get_text_node_value(node)
+            if Constant.Config.support_custom_ph_rule:
+                value = covertToXlsPlaceHolder(value)
             if not Constant.Config.export_only_zh:
                 dic[key] = value
             else:
@@ -331,6 +335,9 @@ def formatCell(value):
             value = str(int(value))  # 浮点转成整型,再转成str
         else:
             value = str(value)
+
+    if Constant.Config.support_custom_ph_rule:
+        value = covertToXmlPlaceHolder(value)
     return value
 
 
@@ -377,3 +384,25 @@ def is_chinese(string):
         if u'\u4e00' <= ch <= u'\u9fff':
             return True
     return False
+
+
+def covertToXlsPlaceHolder(value):
+    """
+    xml占位符转化成excel中可用占位符
+    :param value:
+    :return:
+    """
+    if value is None:
+        return value
+    return convert_str(value)
+
+
+def covertToXmlPlaceHolder(value):
+    """
+    excel占位符转化成xml中可用占位符
+    :param value:
+    :return:
+    """
+    if value is None:
+        return value
+    return reverse_convert_str(value)
