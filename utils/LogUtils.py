@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+from Constant import Config
+
 
 class Log:
     """Log util"""
@@ -12,7 +14,7 @@ class Log:
             print('\033[32m')
             Log.current = "info"
 
-        print(msg)
+        print(f'IFNO: {msg}')
         # print('\033[34m' + msg)
 
         # Log info blue
@@ -28,21 +30,30 @@ class Log:
         if Log.current != "error":
             print('\033[31m')
             Log.current = "error"
-        print(msg)
+        print(f'ERROR: {msg}')
+        # print('\033[31m' + msg)
+
+    @staticmethod
+    def warn(msg):
+        if Log.current != "warn":
+            print('\033[34m')
+            Log.current = "warn"
+        print(f'WARN: {msg}')
         # print('\033[31m' + msg)
 
     # Log debug white
     @staticmethod
     def debug(msg):
-        if Log.current != "debug":
-            print('\033[37m')
-            Log.current = "debug"
-        print(msg)
-        # print('\033[37m' + msg)
+        if Config.isShowDebug:
+            if Log.current != "debug":
+                print('\033[37m')
+                Log.current = "debug"
+            print(f'DEBUG: {msg}')
+            # print('\033[37m' + msg)
 
 
 if __name__ == '__main__':
-    Log.infoln("info")
-    Log.debug("你好")
-    Log.debug("nihao")
     Log.info("info")
+    Log.debug("你好")
+    Log.error("error")
+    Log.warn("warn")

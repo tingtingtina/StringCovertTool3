@@ -82,6 +82,7 @@ class Config:
     keyTitle = "Android keyName"  # key 名（Android 字符串 name)
     moduleTitle = "Android module"  # module 名（xml 文件名）
     support_custom_ph_rule = False  # 是否支持占位符规则替换 ConvertUtils 中处理
+    isShowDebug = False # 是否显示 debug 信息
 
     import_start_col = 2  # 从第几列开始导入
     import_base_xml = False  # 导入是否基于xml

@@ -52,7 +52,11 @@ class XMLParse:
             if data_node is not None and data_node[0].firstChild.nodeType == data_node[0].CDATA_SECTION_NODE:
                 data_value = data_node[0].firstChild.data
                 value = data_value
-        return value
+        try:
+            return value
+        except UnboundLocalError:
+            Log.warn("--Attention key---")
+            return ""
 
     @staticmethod
     def update_multi_xml_value(sub_dir_path, keys, values, modules):
