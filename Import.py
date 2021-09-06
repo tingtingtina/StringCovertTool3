@@ -56,7 +56,7 @@ class ImportUtils:
         :param target_language: 目标语言
         :param target_dir_path: 目标文件目录
         """
-        Log.info("--- xls2xml ---")
+        Log.debug("--- xls2xml ---")
 
         # 输入 excel
         if not xls_path or not os.path.exists(xls_path):
@@ -74,7 +74,7 @@ class ImportUtils:
 
         sheet = xlsParse.sheet_by_index(0)
 
-        Log.info("name = %s， rows number = %s，clos number = %s" % (sheet.name, sheet.nrows, sheet.ncols))
+        Log.debug(f"name = {sheet.name}， nrows = {sheet.nrows}，nclos = {sheet.ncols}")
         return self.convert(sheet)
 
     def convert(self, sheet):
@@ -83,7 +83,7 @@ class ImportUtils:
         :param sheet: excel 的 sheet 对象
         :return: ErrorConstant.Error
         """
-        Log.info("--- convert ---")
+        Log.debug("--- convert ---")
         keyIndex = -1
         moduleIndex = -1
         tempLanguageIndex = None
@@ -118,16 +118,16 @@ class ImportUtils:
         del xlsKeys[0]
 
         if self.filePath and tempLanguageIndex:  # 输入是文件，指定目标语言
-            Log.debug("keyIndex = %s moduleIndex = %s languageIndex = %s" % (keyIndex, moduleIndex, tempLanguageIndex))
+            Log.info(f"keyIndex = {keyIndex} moduleIndex = {moduleIndex} languageIndex = {tempLanguageIndex}")
             # 获取 value 集合，并删除 title 项
             xlsValues = sheet.col_values(tempLanguageIndex)
             del xlsValues[0]
 
             XMLParse.update_xml_value(self.filePath, xlsKeys, xlsValues)
-            Log.info(Constant.Error(Constant.SUCCESS).get_desc_en())
+            Log.debug(Constant.Error(Constant.SUCCESS).get_desc_en())
             return Constant.Error(Constant.SUCCESS)
 
-        Log.debug("Not a file")
+        Log.warn("Not a file")
 
         if moduleIndex == -1:
             Log.error(Constant.Error(Constant.ERROR_MODULE_NOT_FOUND).get_desc_en())
@@ -168,7 +168,7 @@ class ImportUtils:
             # print sub_dir_path
             if os.path.exists(sub_dir_path):
                 XMLParse.update_multi_xml_value(sub_dir_path, xlsKeys, xlsValues, xlsModules)
-        Log.info(Constant.Error(Constant.SUCCESS).get_desc_en())
+        Log.debug(Constant.Error(Constant.SUCCESS).get_desc_en())
         return Constant.Error(Constant.SUCCESS)
 
 
@@ -180,7 +180,7 @@ def addParser():
     parser.add_option("-d", "--targetDirPath", help="means target output is dir contains xml file(s)")
 
     (options, args) = parser.parse_args()
-    Log.info("options: %s, args: %s" % (options, args))
+    Log.debug("options: %s, args: %s" % (options, args))
     return options
 
 

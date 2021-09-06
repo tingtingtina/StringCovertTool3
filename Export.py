@@ -50,25 +50,26 @@ class ExportUtils:
         #  parent, 表示path的路径、
         #  dirnames, path路径下的文件夹的名字
         #  filenames path路径下文件夹以外的其他文件。
-        Log.info("input_dir ---> " + input_dir)
+        Log.debug("input_dir ---> " + input_dir)
         sub_dir_names = []
         for _, dir_names, _ in os.walk(input_dir):
             if dir_names:
                 sub_dir_names = dir_names
                 break
-        Log.info("sub_dir_names-->")
-        Log.info(sub_dir_names)
+        Log.debug("sub_dir_names-->")
+        Log.debug(sub_dir_names)
 
         # 标题下一行写入数据
         row = 2
         # 标准文件夹下所有文件
         files = os.listdir(base_dir)
-        Log.info("标准文件夹下所有文件：")
-        Log.info(files)
+        Log.debug("标准文件夹下所有文件：")
+        Log.debug(files)
         for filename in files:
             module_name = getModuleName(filename)
             if not module_name:
                 continue
+            Log.debug(f"{'-' * 30}")
             file_path = os.path.join(base_dir, filename)  # 文件路径
             base_dict = XMLParse.get_value_and_key(file_path)
 
@@ -81,9 +82,10 @@ class ExportUtils:
 
                 # 当前文件夹的语言
                 lan = getDirLan(input_dir, cur_dir_path)
-                Log.info("current language: " + lan)
-                if not lan:  # 文件夹爱不符合规范不处理（values-lan 或 values）
+                if not lan:  # 文件夹不符合规范不处理（values-lan 或 values）
                     continue
+                else:
+                    Log.debug(f"module_name:{module_name} lan:{lan}")
 
                 # 获取其他按文件夹下的该文件路径
                 cur_file = os.path.join(cur_dir_path, filename)
@@ -102,7 +104,7 @@ class ExportUtils:
             writeDict(ws, base_dict, row, 1, module_name, True)
 
             row += len(base_dict)
-            Log.info("row = %s" % row)
+            Log.debug("row = %s" % row)
 
         workbook.save(xlsPath)
         return Constant.Error(Constant.SUCCESS)
@@ -124,7 +126,7 @@ class ExportUtils:
         dic = XMLParse.get_value_and_key(input_file_path)
         writeDict(ws, dic, 2, 1, None, True)
         workbook.save(xlsPath)
-        Log.info(Constant.Error(Constant.SUCCESS).get_desc_en())
+        Log.debug(Constant.Error(Constant.SUCCESS).get_desc_en())
         return Constant.Error(Constant.SUCCESS)
 
 
@@ -173,7 +175,10 @@ def writeDict(ws, dic, start_row, col, module, isKeepKey):
     """
     row = start_row
     for (key, value) in dic.items():
-        Log.debug("%s : %s" % (key, value))
+        if value == "ERROR":
+            Log.warn(f"{key}:ERROR")
+        else:
+            Log.info(f"{key}:{value}")
         if isKeepKey:
             if module:
                 ws[row][col] = module

@@ -56,7 +56,7 @@ class XMLParse:
             return value
         except UnboundLocalError:
             Log.warn("--Attention key---")
-            return ""
+            return "ERROR"
 
     @staticmethod
     def update_multi_xml_value(sub_dir_path, keys, values, modules):
@@ -67,7 +67,7 @@ class XMLParse:
         :param values: 集合，目标子目录下所有 value
         :param modules: 集合，目标子目录下每个 xml 文件的名字（不含.xml)，三个集合元素一一对应
         """
-        Log.info("\n" + sub_dir_path + "\n")
+        Log.debug("\n" + sub_dir_path + "\n")
         if len(modules) == 0:
             return
 
@@ -120,7 +120,7 @@ class XMLParse:
         :param values: xml 键值对 - value
         :return:
         """
-        Log.info("--- updating xml... \n%s" % file_path)
+        Log.debug("--- updating xml... \n%s" % file_path)
         if not os.path.exists(file_path):
             return
         # Log.info ("--- string ---")
@@ -210,12 +210,12 @@ def update_xml_base_xml(xml_doc, keys, values):
                     # 处理 CDATA
                     data_node = node.getElementsByTagName("Data")
                     data_node[0].firstChild.data = value
-                Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, value))
+                Log.info(f"{xmlKey} : {xmlKey} --> {value}")
                 break
-    Log.info("--- string end ---\n")
+    Log.debug("--- string end ---\n")
 
     # 数组
-    Log.info("--- array ---")
+    Log.debug("--- array ---")
     array_nodes = xml_doc.getElementsByTagName('string-array')
     for array_node in array_nodes:
         xmlKey = array_node.getAttribute('name')
@@ -232,9 +232,9 @@ def update_xml_base_xml(xml_doc, keys, values):
                 value = formatCell(values[index])
                 if key == newKey:
                     child_node.firstChild.data = value
-                    Log.debug("%s : %s --> %s" % (newKey, xmlValue, child_node.firstChild.data))
+                    Log.info(f"{newKey} : {xmlValue} --> {value}")
                     break
-    Log.info("--- array end ---\n")
+    Log.debug("--- array end ---\n")
 
 
 def update_xml_base_xls(xml_doc, keys, values):
@@ -258,7 +258,7 @@ def update_xml_base_xls(xml_doc, keys, values):
                     # 处理 CDATA
                     data_node = node.getElementsByTagName("Data")
                     data_node[0].firstChild.data = value
-                Log.debug("%s : %s -- >%s " % (xmlKey, xmlValue, value))
+                Log.info(f"{xmlKey} : {xmlValue} --> {value}")
                 break
 
             if nodeIndex == (len(nodes) - 1):
@@ -275,7 +275,7 @@ def update_xml_base_xls(xml_doc, keys, values):
                 xml_doc.documentElement.appendChild(newel)
 
     # 数组 （考虑到数组顺序问题，数组暂不支持对标 xls 添加）
-    Log.info("--- array ---")
+    Log.debug("--- array ---")
     array_nodes = xml_doc.getElementsByTagName('string-array')
     for array_node in array_nodes:
         xmlKey = array_node.getAttribute('name')
@@ -292,9 +292,9 @@ def update_xml_base_xls(xml_doc, keys, values):
                 value = formatCell(values[index])
                 if key == newKey:
                     child_node.firstChild.data = value
-                    Log.debug("%s : %s --> %s" % (newKey, xmlValue, child_node.firstChild.data))
+                    Log.info(f"{newKey} : {xmlValue} --> {value}")
                     break
-    Log.info("--- array end ---\n")
+    Log.debug("--- array end ---\n")
 
     # # 数组
     # # Log.info("--- array ---")

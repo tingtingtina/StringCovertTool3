@@ -1,5 +1,9 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+import sys
+
+from loguru import logger
+
 from Constant import Config
 
 
@@ -9,51 +13,44 @@ class Log:
     current = ""
     # Log info green
     @staticmethod
-    def info(msg):
-        if Log.current != "info":
-            print('\033[32m')
-            Log.current = "info"
-
-        print(f'IFNO: {msg}')
-        # print('\033[34m' + msg)
-
-        # Log info blue
-
-    # @staticmethod
-    # def infoln(msg):
-    #     # print('\033[34m')
-    #     self.info('\n'+msg)
+    def debug(msg):
+        # if Log.current != "info":
+        #     print('\033[32m')
+        #     Log.current = "info"
+        #
+        # print(f'DEBUG: {msg}')
+        logger.debug(msg)
 
     # Log error red
     @staticmethod
     def error(msg):
-        if Log.current != "error":
-            print('\033[31m')
-            Log.current = "error"
-        print(f'ERROR: {msg}')
-        # print('\033[31m' + msg)
+        # if Log.current != "error":
+        #     print('\033[31m')
+        #     Log.current = "error"
+        # print(f'ERROR: {msg}')
+        logger.error(msg)
 
     @staticmethod
     def warn(msg):
-        if Log.current != "warn":
-            print('\033[34m')
-            Log.current = "warn"
-        print(f'WARN: {msg}')
-        # print('\033[31m' + msg)
+        # if Log.current != "warn":
+        #     print('\033[34m')
+        #     Log.current = "warn"
+        # print(f'WARN: {msg}')
+        logger.warning(msg)
 
-    # Log debug white
+    # Log info white
     @staticmethod
-    def debug(msg):
-        if Config.isShowDebug:
-            if Log.current != "debug":
-                print('\033[37m')
-                Log.current = "debug"
-            print(f'DEBUG: {msg}')
-            # print('\033[37m' + msg)
+    def info(msg):
+        if Config.isShowInfo:
+            logger.info(msg)
+        #     if Log.current != "debug":
+        #         print('\033[37m')
+        #         Log.current = "debug"
+        #     print(f'INFO: {msg}')
 
 
 if __name__ == '__main__':
-    Log.info("info")
-    Log.debug("你好")
-    Log.error("error")
+    Log.info("你好")
+    Log.debug("debug")
     Log.warn("warn")
+    Log.error("error")
