@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--不需要翻译 start -->
+    <string name="simplified_chinese">中文简体</string>
+    <string name="english">English</string>
+    <!--不需要翻译 end -->
+
+    <string name="mine_item_setting">Settings</string>
+    <string name="me_homepage">Homepage</string>
+    <string name="me_profile">Edit profile</string>
+    <string name="mine_sign">Sign in</string>
+    <string name="mine_signed">Signed in &gt;</string>
+
+    <string name="mine_item_message_reply"><![CDATA[Reply:]]></string>
+
+    <string-array name="gender_item">
+        <item id="0">Male</item>
+        <item id="1">Female</item>
+    </string-array>
+    <string name="create_el3">666</string>
+    <string name="create_el20">666</string>
+    <string name="nfans_search_associate_num"><![CDATA[Total<font color="#FF7439">%s</font>]]></string>
+    <string name="create_el">追加</string>
+    <string name="create_CDATA"><![CDATA[又一个<font color="#FF7439">追加</font>CDATA]]></string>
+    <string name="moment_request_balance">
+        <![CDATA[Balance: <span style="color:#FE741E">%1$d N-Coins %%2$s</span>]]></string>
+    <string name="create_el2"><![CDATA[hhh<u>Add</u>]]></string>
+
+    <string name="create_el8"/>
+
+    <string name="create_el4">666.0</string>
+    <string name="create_el5">666.1</string>
+    <string name="create_el6">666</string>
+    <string name="create_el7">666.2</string>
+</resources>

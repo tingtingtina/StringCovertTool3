@@ -272,6 +272,7 @@ def update_xml_base_xls(xml_doc, keys, values):
                     # 一般文本
                     newText = xml_doc.createTextNode(value)
                     newel.appendChild(newText)
+                Log.info(f"Add--> {key} : {value}")
                 xml_doc.documentElement.appendChild(newel)
 
     # 数组 （考虑到数组顺序问题，数组暂不支持对标 xls 添加）

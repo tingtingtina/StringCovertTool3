@@ -1,18 +1,21 @@
 # -*- coding:utf-8 -*-
+import Constant
 from Import import ImportUtils
 
 
-def main():
+def importTest():
     importUtils = ImportUtils()
-    # options = addParser()
-    # importUtils.xls2xml_options(options)
-
-    xlsPath = "StringCovertTool3/test/Output.xls"
-    filePath ="StringCovertTool3/test/strings_me.xml"
-    dirPath = "StringCovertTool3/test"
-    importUtils.xls2xml(xlsPath, None, None, dirPath)
-    # importUtils.xls2xml(xlsPath, filePath, "en", dirPath)
+    xlsPath = "../test/Output_Test.xls"
+    filePath = "../test/values/strings_test.xml"
+    importUtils.xls2xml(xlsPath, filePath, "en", None)
 
 
-# 读取 xls
+def main():
+    Constant.Config.import_start_col = 5
+    Constant.Config.import_base_xml = False
+    Constant.Config.support_custom_ph_rule = True
+
+    importTest()
+
+
 main()

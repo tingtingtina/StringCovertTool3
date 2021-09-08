@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--不需要翻译 start -->
+    <string name="simplified_chinese">中文简体</string>
+    <string name="english">English</string>
+    <!--不需要翻译 end -->
+
+    <string name="mine_item_setting">设置</string>
+    <string name="me_homepage">主页</string>
+    <string name="me_profile">修改资料</string>
+    <string name="mine_sign">签到</string>
+    <string name="mine_signed">已签到 &gt;</string>
+
+    <string name="mine_item_message_reply"><![CDATA[回复 <font color="#4C4C4C">我：</font>]]></string>
+
+    <string-array name="gender_item">
+        <item id="0">男</item>
+        <item id="1">女</item>
+    </string-array>
+    <string name="create_el3">666</string>
+    <string name="create_el20">666</string>
+    <string name="create_el21">哈哈哈%d哈哈哈%s</string>
+    <string name="nfans_search_associate_num"><![CDATA[共<font color="#FF7439">%s</font>]]></string>
+    <string name="test"><![CDATA[共<font color="#FF7439">%1$s  %%2$d</font>]]></string>
+</resources>
