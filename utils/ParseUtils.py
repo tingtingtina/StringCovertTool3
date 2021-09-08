@@ -1,16 +1,15 @@
 # -*- coding: UTF-8 -*-
-import re
+
+import collections
+import os.path
+import xml.dom.minidom
 
 import xlrd
-import xml.dom.minidom
-import os.path
-
 from xlrd import Book
 
 import Constant
 from utils.ConvertUtils import convert_str, reverse_convert_str
 from utils.LogUtils import Log
-import collections
 
 
 class XLSParse:
@@ -273,7 +272,13 @@ def update_xml_base_xls(xml_doc, keys, values):
                     newText = xml_doc.createTextNode(value)
                     newel.appendChild(newText)
                 Log.info(f"Add--> {key} : {value}")
+                indentNode = xml_doc.createTextNode('\t')
+                xml_doc.documentElement.appendChild(indentNode)
+
                 xml_doc.documentElement.appendChild(newel)
+                
+                textNode = xml_doc.createTextNode('\n')
+                xml_doc.documentElement.appendChild(textNode)
 
     # 数组 （考虑到数组顺序问题，数组暂不支持对标 xls 添加）
     Log.debug("--- array ---")

@@ -227,6 +227,7 @@ if is_chinese(value) or file_path.find("values-en") >= 0:
    2. ✔️string：CDATA
    3. string-array
    4. 导入支持常用标签比如<u> <b> <i>
+   5. ✔️追加导入需要格式化（追加 textNode 实现）
 
 2. ✔️导入是数字时，xlrd会读成浮点型，需兼容
 
