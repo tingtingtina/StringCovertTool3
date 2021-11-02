@@ -194,7 +194,9 @@ def writeDict(ws, dic, start_row, col, module, isKeepKey):
 
 def sortDic(base_dict, dict2):
     """
-    dic2 根据 base_dict key 的顺序排序，如果 dict2 中的 key 不在 base_dict 中存在，则添加至 base_dict 最后
+    dic2 根据 base_dict key 的顺序排序
+    1. 如果 base_dict 中没有 dict2 中的 key，则添加至 base_dict 最后
+    2. 如果 dict2 中缺少 base_dict 中的 key，则补充对应 dict2[key] = base_dict[key]
     :param base_dict: 目标 key 顺序
     :param dict2:
     :return:
@@ -206,12 +208,20 @@ def sortDic(base_dict, dict2):
         for (temp_key, temp_value) in dict2.items():
             if key == temp_key:
                 isMatch = True
-                result_dict[key] = temp_value
+                # TODO LinkQ1 这种写法还是会导出所有的中文 😴，如果期望导出未翻译的所有小语种，需要再筛选excel
+                if Constant.Config.export_only_zh and not is_chinese(temp_value):
+                    # 如果只导出中文，那么清空非中文内容 和 包含 @string 内容（间接引用，无需处理）
+                    result_dict[key] = None
+                else:
+                    result_dict[key] = temp_value
                 del dict2_temp[key]
+                continue
+
         if not isMatch:  # 循环结束，没有找到
-            result_dict[key] = ""
+            # 2. 默认为 base 中的value
+            result_dict[key] = value
     if len(dict2_temp) != 0:
         for (key, value) in dict2_temp.items():
             result_dict[key] = value
-            base_dict[key] = ""
+            base_dict[key] = None
     return base_dict, result_dict

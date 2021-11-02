@@ -36,14 +36,14 @@ def covertTargetPath(dir_path, language):
 
 
 class ImportUtils:
-    keyTitle = Constant.Config.keyTitle
-    moduleTitle = Constant.Config.moduleTitle  # 内容为文件名
-    targetLanguage = None  # 目标语言，与 filePath 成对使用
-    filePath = None  # 目标文件路径
-    dirPath = None  # 目标目录路径
-    fromIndex = Constant.Config.import_start_col  # 从 fromIndex 开始往后列导入
 
     def __init__(self):
+        self.keyTitle = Constant.Config.keyTitle
+        self.moduleTitle = Constant.Config.moduleTitle  # 内容为文件名
+        self.targetLanguage = None  # 目标语言，与 filePath 成对使用
+        self.filePath = None  # 目标文件路径
+        self.dirPath = None  # 目标目录路径
+        self.fromIndex = Constant.Config.import_start_col  # 从 fromIndex 开始往后列导入
         pass
 
     def xls2xml_options(self, options):

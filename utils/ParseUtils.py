@@ -145,10 +145,14 @@ class XMLParse:
         if not file_path or not os.path.exists(file_path):
             Log.error("xml 文件不存在")
             return
-        if Constant.Config.export_only_zh:
-            # 仅中文，排除 values-zh 和 ja 文件夹（日语有太多中文，容易被误导出，因此先忽略掉）
-            if "values-zh" in file_path or "values-ja" in file_path:
-                return collections.OrderedDict()
+        # TODO LinkQ1 (仅为语法高亮提示）
+        # -- 如果是以 zh 为基准的话 又只导出中文，那么排除掉 zh文件夹，这里就会有基准缺失问题
+        # -- 此处暂不处理，在排序的时候处理，一是保证基准完整，二是便于补充多语中还没有 key 的内容，但 单个文件导出的时候还是可以这样处理的。
+        # if Constant.Config.export_only_zh:
+            # 1. 保证 baseDir 内容完整 （需要排除基准文件夹，对应基准文件夹是 values 下面写法仍有问题）
+            # 2. 仅中文，排除 values-zh 和 ja 文件夹（日语有太多中文，容易被误导出，因此先忽略掉）
+            # if not (Constant.Config.export_base_dir in file_path) and ("values-zh" in file_path or "values-ja" in file_path):
+            #     return collections.OrderedDict()
         xml_doc = xml.dom.minidom.parse(file_path)
         nodes = xml_doc.getElementsByTagName('string')
         dic = collections.OrderedDict()
@@ -165,15 +169,24 @@ class XMLParse:
             key = node.getAttribute("name")
 
             value = XMLParse.get_text_node_value(node)
+
+            if "@string" in value:
+                # @string 间接引用内容不导出
+                continue
+
             if Constant.Config.support_custom_ph_rule:
                 value = covertToXlsPlaceHolder(value)
-            if not Constant.Config.export_only_zh:
-                dic[key] = value
-            else:
-                # 仅导出中文，是中文，则保存
-                if is_chinese(value):
-                    dic[key] = value
 
+            # 目标只想导出中文的时候，以zh为标准，比如 fr 中列表只有中文，那么就无法区分哪些是 fr中本来就没有key 还是这个key有对应的value
+            dic[key] = value
+            # -- START 这里判断了中文，有个问题：（11.1）
+            # if not Constant.Config.export_only_zh:
+            #     dic[key] = value
+            # else:
+            #     # 仅导出中文，是中文，则保存
+            #     if is_chinese(value):
+            #         dic[key] = value
+            # -- END
             # Log.info("%s : %s" % (key, value))
 
         array_nodes = xml_doc.getElementsByTagName("string-array")
@@ -183,11 +196,18 @@ class XMLParse:
             for idx, child_node in enumerate(child_nodes):
                 newKey = convertStringArrayName(key, str(idx))
                 value = XMLParse.get_text_node_value(child_node)
-                if not Constant.Config.export_only_zh:
-                    dic[newKey] = value
-                else:
-                    if is_chinese(value):
-                        dic[newKey] = value
+                if "@string" in value:
+                    # @string 间接引用内容不导出
+                    continue
+                # 目标只想导出中文的时候，以zh为标准，比如 fr 中列表只有中文，那么就无法区分哪些是 fr中本来就没有key 还是这个key有对应的value
+                dic[newKey] = value
+                # -- START 这里判断了中文，有个问题：（11.1）
+                # if not Constant.Config.export_only_zh:
+                #     dic[newKey] = value
+                # else:
+                #     if is_chinese(value):
+                #         dic[newKey] = value
+                # -- END
         return dic
 
 
@@ -276,7 +296,7 @@ def update_xml_base_xls(xml_doc, keys, values):
                 xml_doc.documentElement.appendChild(indentNode)
 
                 xml_doc.documentElement.appendChild(newel)
-                
+
                 textNode = xml_doc.createTextNode('\n')
                 xml_doc.documentElement.appendChild(textNode)
 
