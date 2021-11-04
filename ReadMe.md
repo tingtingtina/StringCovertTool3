@@ -180,7 +180,7 @@ export_apply_translatable = True  # 对 translatable 处理
 
 ---
 
-- ***export_ignore_translatable* **
+- ***export_ignore_translatable***
 
     > 在国际化当中会有一些不需要被国际化的文案，比如 App 中的语言设置，对语言描述是不需要被国际化的。比如下面文案，不论在中文环境下还是英文或者其他语种，都不需要对其进行翻译，所以可以通过添加属性 translatable 为 false 来处理。
     >
@@ -209,15 +209,17 @@ export_apply_translatable = True  # 对 translatable 处理
 
 - 上面直接使用参数的方式还是容易出错，建议使用下面的方式，更清晰易懂
 
+  >编者注：在后期实际应用场景中，还是使用单元测试入口更灵活，而且 python 对可视化的配置不是很友好，可能会出现环境异常等错误。
+
 ```python pick_me.py install```
 
 **xml——>excel**
 
-![导出](https://github.com/tingtingtina/StringCovertTool/blob/master/image/export%20xml.png)
+![export xml](img/export xml.png)
 
 **excel——>xml**
 
-![导入](https://github.com/tingtingtina/StringCovertTool/blob/master/image/import%20xml.png)
+![导入](img/import xml.png)
 
 ## 测试
 - ImportTestUnit.py 和 ExportTestUnit.py 用户导入导出测试
@@ -260,15 +262,15 @@ if is_chinese(value) or file_path.find("values-en") >= 0:
 
 1. 导入支持追加 key-value，减少人工对齐
 
-   1. ✔️string
-   2. ✔️string：CDATA
+   1. ✅ string
+   2. ✅ string：CDATA
    3. string-array
    4. 导入支持常用标签比如<u> <b> <i>
-   5. ✔️追加导入需要格式化（追加 textNode 实现）
+   5. ✅ 追加导入需要格式化（追加 textNode 实现）
 
-2. ✔️导入是数字时，xlrd会读成浮点型，需兼容
+2. ✅ 导入是数字时，xlrd 会读成浮点型，需兼容
 
-3. ✔️特殊空处理
+3. ✅ 特殊空处理
 
    1. xml 中 <string> 空字符串
 
@@ -279,6 +281,13 @@ if is_chinese(value) or file_path.find("values-en") >= 0:
       >导入允许导入空
       >
       >重点处理 xml 是空，导入时，Log 输出 xmlValue 为空情况
+
+4. 对于法语、意大利语等包含单引号的文案需要处理
+
+   > 在 Android 工程里，单引号需要转移，比如 L'amour ，在项目中需要写为  L\\\'amour
+
+   1. 导出：合理去除转义符
+   2. 导入：自动添加转义符
 
 ## Q：
 
