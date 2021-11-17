@@ -71,6 +71,7 @@ isShowInfo = True # 是否显示 info 信息
 
 import_start_col = 2  # 从第几列开始导入
 import_base_xml = True  # 导入是否基于xml
+import_allow_none = False # 导入是否允许导入空，目前仅在import_base_xml为 True 有效
 
 export_excel_name = "Output.xls"  # 导出的 excel 文件名
 export_base_dir = "values-zh"  # 导出基准文件夹
@@ -134,6 +135,12 @@ export_apply_translatable = True  # 对 translatable 处理
     - 字符串数组（不支持追加）
       
         - 考虑到 xls 可能是乱序，追加容易错位，使用属性标识顺序，还是不太方便，暂不支持。
+
+- ***import_allow_none***
+
+    导入是否允许导入空，目前仅在 `import_base_xml`为 `True` 有效
+
+    True，如果xls内容为空也会导入或追加；反之会忽略不处理
 
 - ***export_only_zh***（更适用于文件夹导出）
 

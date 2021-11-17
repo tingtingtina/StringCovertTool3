@@ -257,11 +257,21 @@ def update_xml_base_xml(xml_doc, keys, values):
 
 
 def update_xml_base_xls(xml_doc, keys, values):
+    """
+    根据表格内容更新 xml
+    :param xml_doc: xml节点
+    :param keys: xls 中 keys
+    :param values: xls 中 values
+    :return:
+    """
     # 如果不存在 xls 中的 key，则 append
     nodes = xml_doc.getElementsByTagName('string')
     for index, key in enumerate(keys):
         value = formatCell(values[index])
         if isStringArrayKey(key) is not None:
+            continue
+        if not Constant.Config.import_allow_none and (value is None or len(value) is 0):
+            # 不支持 xls 空数据导入时处理
             continue
         for nodeIndex, node in enumerate(nodes):
             xmlKey = node.getAttribute("name")
