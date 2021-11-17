@@ -196,7 +196,7 @@ def sortDic(base_dict, dict2):
     """
     dic2 根据 base_dict key 的顺序排序
     1. 如果 base_dict 中没有 dict2 中的 key，则添加至 base_dict 最后
-    2. 如果 dict2 中缺少 base_dict 中的 key，则补充对应 dict2[key] = base_dict[key]
+    2. 如果 dict2 中缺少 base_dict 中的 key，当仅导出中文时，则补充对应 dict2[key] = base_dict[key]；否则对应 key 为空 dict2[key]= None
     :param base_dict: 目标 key 顺序
     :param dict2:
     :return:
@@ -218,8 +218,12 @@ def sortDic(base_dict, dict2):
                 continue
 
         if not isMatch:  # 循环结束，没有找到
-            # 2. 默认为 base 中的value
-            result_dict[key] = value
+            # 2. 仅导出中文时，默认为 base 中的value
+            if Constant.Config.export_only_zh:
+                result_dict[key] = value
+            else:
+                # 正常导出，如果没有 hit 则为空
+                result_dict[key] = None
     if len(dict2_temp) != 0:
         for (key, value) in dict2_temp.items():
             result_dict[key] = value

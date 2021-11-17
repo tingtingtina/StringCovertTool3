@@ -7,14 +7,14 @@
 ## 功能列表
 
 - 导出：
-  - 支持 Android value 文件夹 或文件 导出字符串到表格中
+  - 支持 Android value 文件夹 或 strings.xml 文件 导出字符串到表格中
   - 支持 带有 `translatable` 标签的文本不导出，参考配置 `export_apply_translatable`
   - 支持翻译全部导出制定表格，配置`export_excel_name`，可设置输出表格名
-  - 支持导出为翻译的文案（配置选择仅导入中文，默认未翻译的文本会显示中文），参考配置 `export_only_zh`
+  - 支持导出未翻译的文案（配置选择仅导入中文，默认未翻译的文本会显示中文），参考配置 `export_only_zh`
   - 注：导出去除了间接引用的导出，比如 `<string name="app">@string/app_name</string>`, 间接引用不会被导出
 - 导入：
-  - 支持 指定格式表格中文本内容导入到指定的文件或文件目录中
-  - 支持未定义字段按照表格补齐，参考配置 `import_base_xml`
+  - 支持 指定格式表格中文本内容导入到目标文件或文件目录中
+  - 支持未定义字段按照表格 KV 补齐，参考配置 `import_base_xml`
 - 其他：
   - 导入导出目前均支持一般文本类型、CDATA 类型文案、数组文案
   - 支持占位符替换（为多端统一）参见 `support_custom_ph_rule` 描述
@@ -77,6 +77,7 @@ export_base_dir = "values-zh"  # 导出基准文件夹
 export_base_title = "zh"  # 导出基准 title
 
 export_only_zh = False  # 是否仅导出中文字符
+export_save_string = False # 是否导出 @string 的字符串
 
 # 在 Android 中，如果字符串使用了 translatable 比如
 # <string name="english" translatable="false">English</string>
@@ -192,7 +193,9 @@ export_apply_translatable = True  # 对 translatable 处理
 
 比较常用的是，配合仅导出中文属性一同使用，可以避免这些不用翻译的内容被再次导出。
 
+- ***export_save_string***
 
+  导数时是否保留 @string 字符串，默认 False，@string 的内容不导出
 
 - ***support_custom_ph_rule***
 

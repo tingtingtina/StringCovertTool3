@@ -94,6 +94,7 @@ class Config:
     export_base_title = "zh"  # 导出基准 title
 
     export_only_zh = False  # 是否仅导出中文字符
+    export_save_string = False # 是否导出 @string 的字符串
 
     # 在 Android 中，如果字符串使用了 translatable 比如
     # <string name="english" translatable="false">English</string>

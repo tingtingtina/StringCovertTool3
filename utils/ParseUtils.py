@@ -170,7 +170,7 @@ class XMLParse:
 
             value = XMLParse.get_text_node_value(node)
 
-            if "@string" in value:
+            if not Constant.Config.export_save_string and "@string" in value:
                 # @string 间接引用内容不导出
                 continue
 
@@ -196,7 +196,7 @@ class XMLParse:
             for idx, child_node in enumerate(child_nodes):
                 newKey = convertStringArrayName(key, str(idx))
                 value = XMLParse.get_text_node_value(child_node)
-                if "@string" in value:
+                if not Constant.Config.export_save_string and "@string" in value:
                     # @string 间接引用内容不导出
                     continue
                 # 目标只想导出中文的时候，以zh为标准，比如 fr 中列表只有中文，那么就无法区分哪些是 fr中本来就没有key 还是这个key有对应的value
