@@ -19,6 +19,7 @@
   - 导入导出目前均支持一般文本类型、CDATA 类型文案、数组文案
   - 支持占位符替换（为多端统一）参见 `support_custom_ph_rule` 描述
   - 支持 Info 类型 Log 是否输出（替换过程），设置 `isShowInfo`
+  - 支持导入导出自动去除和添加转义符号（在Android 项目里，竖引号需要转义，斜引号不需要）
 
 ## 结果说明
 
@@ -292,7 +293,7 @@ if is_chinese(value) or file_path.find("values-en") >= 0:
       >
       >重点处理 xml 是空，导入时，Log 输出 xmlValue 为空情况
 
-4. 对于法语、意大利语等包含单引号的文案需要处理
+4. ✅对于法语、意大利语等包含单引号的文案需要处理
 
    > 在 Android 工程里，单引号需要转移，比如 L'amour ，在项目中需要写为  L\\\'amour
 

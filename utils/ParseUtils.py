@@ -52,7 +52,8 @@ class XMLParse:
                 data_value = data_node[0].firstChild.data
                 value = data_value
         try:
-            return value
+            # 去掉转义符号
+            return value.replace("\\", "")
         except UnboundLocalError:
             Log.warn("--Attention key---")
             return "ERROR"
@@ -378,6 +379,10 @@ def formatCell(value):
 
     if Constant.Config.support_custom_ph_rule:
         value = covertToXmlPlaceHolder(value)
+
+    # 为单引号字符添加转义
+    if value.find("\\") == -1:
+        value = value.replace("'", "\\'")
     return value
 
 
