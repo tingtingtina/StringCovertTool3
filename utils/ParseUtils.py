@@ -53,7 +53,7 @@ class XMLParse:
                 value = data_value
         try:
             # 去掉转义符号
-            return value.replace("\\", "")
+            return value.replace("\\'", "'")
         except UnboundLocalError:
             Log.warn("--Attention key---")
             return "ERROR"
@@ -383,6 +383,9 @@ def formatCell(value):
     # 为单引号字符添加转义
     if value.find("\\") == -1:
         value = value.replace("'", "\\'")
+
+    # NBSP 空格 转换为普通空格
+    value = value.replace(u'\xa0', ' ')
     return value
 
 
