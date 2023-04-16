@@ -223,6 +223,9 @@ def update_xml_base_xml(xml_doc, keys, values):
         xmlValue = XMLParse.get_text_node_value(node)
         for index, key in enumerate(keys):
             value = formatCell(values[index])
+            if not Constant.Config.import_allow_none and (value is None or len(value) is 0):
+                # 不支持 xls 空数据导入时处理
+                continue
             if key == xmlKey:
                 if node.firstChild.nodeType == node.TEXT_NODE or node.firstChild.nodeType == node.CDATA_SECTION_NODE:
                     node.firstChild.data = value
@@ -251,9 +254,12 @@ def update_xml_base_xml(xml_doc, keys, values):
             for index, key in enumerate(keys):
                 value = formatCell(values[index])
                 if key == newKey:
-                    child_node.firstChild.data = value
-                    Log.info(f"{newKey} : {xmlValue} --> {value}")
-                    break
+                    if child_node.firstChild is not None:
+                        child_node.firstChild.data = value
+                        Log.info(f"{newKey} : {xmlValue} --> {value}")
+                        break
+                    else:
+                        Log.error(f"{newKey} : {xmlValue} --> {value}")
     Log.debug("--- array end ---\n")
 
 
@@ -381,8 +387,8 @@ def formatCell(value):
         value = covertToXmlPlaceHolder(value)
 
     # 为单引号字符添加转义
-    if value.find("\\") == -1:
-        value = value.replace("'", "\\'")
+    value = value.replace("\\'", "'")
+    value = value.replace("'", "\\'")
 
     # NBSP 空格 转换为普通空格
     value = value.replace(u'\xa0', ' ')

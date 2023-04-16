@@ -54,7 +54,7 @@ class ImportUtils:
         :param xls_path: 表格路径
         :param file_path: 目标文件路径
         :param target_language: 目标语言
-        :param target_dir_path: 目标文件目录
+        :param target_dir_path: 目标文件目录，到 value 上一级 比如 xxx/src/main/res
         """
         Log.debug("--- xls2xml ---")
 
