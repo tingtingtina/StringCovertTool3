@@ -79,12 +79,15 @@ class Config:
     def __init__(self):
         pass
 
-    keyTitle = "Android keyName"  # key 名（Android 字符串 name)
-    moduleTitle = "Android module"  # module 名（xml 文件名）
+    # keyTitle = "Android keyName"  # key 名（Android 字符串 name)
+    # moduleTitle = "Android module"  # module 名（xml 文件名）
+    keyTitle = 'key'
+    moduleTitle = 'module'
+
     support_custom_ph_rule = False  # 是否支持占位符规则替换 ConvertUtils 中处理
     isShowInfo = True # 是否显示 info 信息
 
-    import_start_col = 2  # 从第几列开始导入
+    import_start_col = 2  # 从第几列开始导入 （从0开始）
     import_base_xml = False  # 导入是否基于xml
     # True，基于 xml 只替换xml 存在的 key-value
     # False，基于 xls，如果 xml 有对应 key 替换，如果没有，则在文件末尾追加对应 文案
